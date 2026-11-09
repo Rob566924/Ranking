@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ranking de Guardianes</title>
+<style>
+  body { margin:0; background:#eef5ff; }
+  .rk { font-family:'Segoe UI',Arial,sans-serif; max-width:1100px; margin:auto; padding:16px; color:#0f172a; }
+  .rk * { box-sizing:border-box; }
+  .rk h2 { margin:0 0 12px; }
+
+  .rk-top { background:linear-gradient(135deg,#0b1f4d,#1e3a8a,#0e7490); background-size:200% 200%;
+    animation:rkFondo 10s ease infinite; color:#fff; padding:34px 28px; border-radius:25px;
+    box-shadow:0 8px 25px rgba(0,0,0,.25); text-align:center; }
+  @keyframes rkFondo { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+  .rk-top h1 { margin:0 0 8px; font-size:32px; }
+  .rk-top p { margin:0; font-size:17px; opacity:.95; }
+
+  .rk-box { margin-top:22px; background:#fff; padding:24px; border-radius:20px; box-shadow:0 4px 15px rgba(0,0,0,.08); }
+
+  /* Mi posición */
+  .rk-yo { display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr)); gap:14px; margin-top:16px; }
+  .rk-stat { background:#f1f5f9; border-radius:16px; padding:14px; text-align:center; }
+  .rk-stat .n { font-size:24px; font-weight:800; color:#2563eb; }
+  .rk-stat .l { font-size:13px; color:#475569; }
+  .rk-nombre { display:flex; flex-wrap:wrap; gap:10px; align-items:center; }
+  .rk-nombre input { flex:1 1 220px; padding:10px 14px; border-radius:30px; border:2px solid #cbd5e1; font-size:15px; font-family:inherit; }
+  .rk-nombre input:focus { outline:none; border-color:#2563eb; }
+  .rk-barra { height:20px; background:#dbeafe; border-radius:20px; overflow:hidden; margin-top:16px; }
+  .rk-barra div { height:100%; width:0; background:linear-gradient(90deg,#2563eb,#06b6d4); transition:width 1s ease; border-radius:20px; }
+  .rk-sig { margin:8px 0 0; font-size:14px; color:#475569; }
+
+  /* Podio */
+  .rk-podio { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; align-items:end; margin-top:16px; }
+  .rk-p { text-align:center; border-radius:18px; padding:16px 8px; background:#f1f5f9; }
+  .rk-p .m { font-size:38px; }
+  .rk-p .nm { font-weight:700; margin:4px 0; word-break:break-word; }
+  .rk-p .pt { color:#475569; font-size:14px; }
+  .rk-p.p1 { background:#fef3c7; padding-top:30px; padding-bottom:30px; border:2px solid #f59e0b; }
+  .rk-p.p2 { background:#e2e8f0; padding-top:22px; padding-bottom:22px; }
+  .rk-p.p3 { background:#ffedd5; }
+
+  /* Tabla */
+  .rk-tabla { width:100%; border-collapse:collapse; margin-top:14px; font-size:15px; }
+  .rk-tabla th { text-align:left; font-size:13px; color:#64748b; padding:8px 10px; border-bottom:2px solid #e2e8f0; }
+  .rk-tabla td { padding:10px; border-bottom:1px solid #e2e8f0; }
+  .rk-tabla tr.yo td { background:#dbeafe; font-weight:700; }
+  .rk-scroll { overflow-x:auto; }
+  .rk-vacio { color:#64748b; text-align:center; padding:16px; }
+
+  /* Rangos */
+  .rk-rangos { display:flex; flex-wrap:wrap; gap:12px; margin-top:14px; }
+  .rk-r { flex:1 1 150px; text-align:center; padding:14px 8px; border-radius:14px; background:#f1f5f9; border:2px dashed #cbd5e1; }
+  .rk-r .e { font-size:30px; filter:grayscale(1); opacity:.4; }
+  .rk-r small { display:block; font-size:12px; color:#64748b; margin-top:4px; }
+  .rk-r.on { background:#fef9c3; border:2px solid #eab308; }
+  .rk-r.on .e { filter:none; opacity:1; }
+
+  .rk-nota { margin-top:14px; font-size:13px; color:#64748b; }
+
+  .rk-nav { display:flex; flex-wrap:wrap; gap:10px; margin-top:26px; justify-content:center; }
+  .rk-volver { display:inline-block; padding:8px 18px; border-radius:30px; background:#e2e8f0; color:#1e3a8a;
+    font-weight:600; text-decoration:none; transition:all .25s; }
+  .rk-volver:hover { background:#1e3a8a; color:#fff; transform:translateY(-3px); }
+
+  @media (max-width:600px){ .rk-top h1{font-size:24px} .rk-p .m{font-size:28px} }
+</style>
+</head>
+<body>
+
+<div class="rk">
+
+  <div class="rk-top">
+    <h1>🏆 Ranking de Guardianes</h1>
+    <p>Consulta tu posición, compárate con otros Guardianes Digitales y sigue ascendiendo hasta Magistrado Digital.</p>
+  </div>
+
+  <!-- MI POSICIÓN -->
+  <div class="rk-box">
+    <h2>🎖️ Mi posición</h2>
+    <div class="rk-nombre">
+      <label for="nombre"><b>Tu nombre o alias:</b></label>
+      <input id="nombre" type="text" maxlength="30" placeholder="Escribe tu nombre para aparecer en el ranking">
+    </div>
+    <div class="rk-yo">
+      <div class="rk-stat"><div class="n" id="yPos">–</div><div class="l">🏁 Posición</div></div>
+      <div class="rk-stat"><div class="n" id="yRango">Recluta Digital</div><div class="l">🎖️ Rango actual</div></div>
+      <div class="rk-stat"><div class="n" id="yPts">0</div><div class="l">⭐ Puntos de Justicia</div></div>
+      <div class="rk-stat"><div class="n" id="yMis">0 / 4</div><div class="l">🎯 Misiones completadas</div></div>
+    </div>
+    <div class="rk-barra"><div id="yBarra"></div></div>
+    <p class="rk-sig" id="ySig"></p>
+  </div>
+
+  <!-- PODIO Y TABLA -->
+  <div class="rk-box">
+    <h2>🥇 Podio de Guardianes</h2>
+    <div class="rk-podio" id="podio"></div>
+  </div>
+
+  <div class="rk-box">
+    <h2>📋 Clasificación general</h2>
+    <div class="rk-scroll">
+      <table class="rk-tabla">
+        <thead><tr><th>#</th><th>Guardián</th><th>Rango</th><th>Puntos</th></tr></thead>
+        <tbody id="tabla"></tbody>
+      </table>
+    </div>
+    <p class="rk-nota" id="nota"></p>
+  </div>
+
+  <!-- RANGOS -->
+  <div class="rk-box">
+    <h2>🎖️ Escala de rangos</h2>
+    <div class="rk-rangos" id="rangos"></div>
+  </div>
+
+  <div class="rk-nav">
+    <a class="rk-volver" href="https://sites.google.com/view/act2gamification-robertobg/inicio" target="_blank" rel="noopener noreferrer">← Volver al inicio</a>
+    <a class="rk-volver" href="https://sites.google.com/view/act2gamification-robertobg/centro-de-mando-judicial" target="_blank" rel="noopener noreferrer">Centro de Mando</a>
+    <a class="rk-volver" href="https://sites.google.com/view/act2gamification-robertobg/misiones" target="_blank" rel="noopener noreferrer">Ir a Misiones</a>
+  </div>
+</div>
+
+<script>
+(function () {
+  // ================= CONFIGURACIÓN (EDICIÓN AQUÍ) =================
+  // Puntos por misión (mismos ids que la página de Misiones)
+  var PUNTOS = { 1:100, 2:100, 3:100, 4:150 };
+  var RANGOS = [
+    { nombre:'Recluta Digital',    icono:'🪖', min:0   },
+    { nombre:'Guardián Digital',   icono:'🛡️', min:100 },
+    { nombre:'Protector de Datos', icono:'🔐', min:200 },
+    { nombre:'Innovador Digital',  icono:'💡', min:300 },
+    { nombre:'Magistrado Digital', icono:'🏛️', min:450 }
+  ];
+
+  // Opción A (recomendada): hoja de Google Sheets publicada como CSV con dos columnas: Nombre, Puntos.
+  // Archivo > Compartir > Publicar en la web > Hoja > formato CSV, y pega aquí el enlace.
+  var URL_HOJA_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRPjbxjaK94ewYgwqS38-S9XBpsLmJjYbadi0tmT6kLxVgqo8RtW3gcxlpE-FhWdVeQLJL3izzV_eeC/pub?gid=0&single=true&output=csv';
+
+  // Opción B: participantes de ejemplo. Pon USAR_EJEMPLOS en false cuando tengas datos reales.
+  var USAR_EJEMPLOS = false;
+  var EJEMPLOS = [
+    { nombre:'Ana (ejemplo)',    puntos:450 },
+    { nombre:'Luis (ejemplo)',   puntos:350 },
+    { nombre:'Marta (ejemplo)',  puntos:200 },
+    { nombre:'Carlos (ejemplo)', puntos:100 }
+  ];
+
+  var CLAVE = 'guardianes_progreso_v1';   // misma clave que Misiones y Centro de Mando
+  var CLAVE_NOMBRE = 'guardianes_nombre_v1';
+  // ===============================================================
+
+  function $(id) { return document.getElementById(id); }
+  var remotos = [];      // participantes leídos de la hoja
+  var nombre = '';
+  var ultimaFirma = '';
+
+  function leerProgreso() {
+    try {
+      var d = localStorage.getItem(CLAVE), a = d ? JSON.parse(d) : [];
+      return Array.isArray(a) ? a : [];
+    } catch (e) { return []; }
+  }
+  function leerNombre() { try { return localStorage.getItem(CLAVE_NOMBRE) || ''; } catch (e) { return ''; } }
+  function guardarNombre(v) { try { localStorage.setItem(CLAVE_NOMBRE, v); } catch (e) {} }
+
+  function puntosDe(ids) {
+    var t = 0;
+    ids.forEach(function (id) { if (PUNTOS[id]) t += PUNTOS[id]; });
+    return t;
+  }
+  function rangoDe(p) {
+    var r = RANGOS[0];
+    RANGOS.forEach(function (x) { if (p >= x.min) r = x; });
+    return r;
+  }
+
+  function parseCSV(txt) {
+    var out = [];
+    txt.split(/\r?\n/).forEach(function (l) {
+      if (!l.trim()) return;
+      var c = l.split(',');
+      var pts = parseInt((c[c.length - 1] || '').replace(/[^0-9-]/g, ''), 10);
+      var nom = c.slice(0, c.length - 1).join(',').replace(/^"|"$/g, '').trim();
+      if (nom && !isNaN(pts)) out.push({ nombre:nom, puntos:pts });
+    });
+    return out;
+  }
+
+  function cargarHoja() {
+    if (!URL_HOJA_CSV) return;
+    fetch(URL_HOJA_CSV).then(function (r) { return r.text(); })
+      .then(function (t) { remotos = parseCSV(t); render(true); })
+      .catch(function () { $('nota').textContent = '⚠️ No se pudo cargar la hoja del ranking. Se muestran solo tus datos locales.'; });
+  }
+
+  function construirLista(misPts) {
+    var base = URL_HOJA_CSV ? remotos.slice() : (USAR_EJEMPLOS ? EJEMPLOS.slice() : []);
+    var lista = base.map(function (x) { return { nombre:x.nombre, puntos:x.puntos, yo:false }; });
+    var miNombre = nombre.trim() || 'Tú';
+    var idx = -1;
+    lista.forEach(function (x, i) { if (x.nombre.toLowerCase() === miNombre.toLowerCase()) idx = i; });
+    if (idx > -1) { lista[idx].puntos = Math.max(lista[idx].puntos, misPts); lista[idx].yo = true; }
+    else lista.push({ nombre:miNombre, puntos:misPts, yo:true });
+    lista.sort(function (a, b) { return b.puntos - a.puntos || a.nombre.localeCompare(b.nombre); });
+    return lista;
+  }
+
+  function celda(tr, txt) { var td = document.createElement('td'); td.textContent = txt; tr.appendChild(td); return td; }
+
+  function render(forzar) {
+    var ids = leerProgreso();
+    var firma = JSON.stringify(ids) + '|' + nombre + '|' + remotos.length;
+    if (!forzar && firma === ultimaFirma) return;
+    ultimaFirma = firma;
+
+    var pts = puntosDe(ids);
+    var n = Math.min(ids.length, 4);
+    var rango = rangoDe(pts);
+    var lista = construirLista(pts);
+    var pos = 0;
+    lista.forEach(function (x, i) { if (x.yo) pos = i + 1; });
+
+    // Mi posición
+    $('yPos').textContent = '#' + pos + ' de ' + lista.length;
+    $('yRango').textContent = rango.nombre;
+    $('yPts').textContent = pts;
+    $('yMis').textContent = n + ' / 4';
+    var maxPts = RANGOS[RANGOS.length - 1].min;
+    $('yBarra').style.width = Math.min(100, Math.round(pts / maxPts * 100)) + '%';
+    var sig = null;
+    RANGOS.forEach(function (x) { if (!sig && x.min > pts) sig = x; });
+    $('ySig').textContent = sig ? 'Te faltan ' + (sig.min - pts) + ' puntos para alcanzar el rango ' + sig.nombre + '.'
+                                : '👑 ¡Has alcanzado el rango máximo!';
+
+    // Podio (orden visual: 2º, 1º, 3º)
+    var podio = $('podio'); podio.innerHTML = '';
+    var meds = ['🥇', '🥈', '🥉'], orden = [1, 0, 2];
+    orden.forEach(function (i) {
+      if (!lista[i]) return;
+      var d = document.createElement('div'); d.className = 'rk-p p' + (i + 1);
+      var m = document.createElement('div'); m.className = 'm'; m.textContent = meds[i];
+      var nm = document.createElement('div'); nm.className = 'nm'; nm.textContent = lista[i].nombre + (lista[i].yo ? ' (tú)' : '');
+      var pt = document.createElement('div'); pt.className = 'pt'; pt.textContent = lista[i].puntos + ' pts';
+      d.appendChild(m); d.appendChild(nm); d.appendChild(pt); podio.appendChild(d);
+    });
+
+    // Tabla
+    var tb = $('tabla'); tb.innerHTML = '';
+    lista.forEach(function (x, i) {
+      var tr = document.createElement('tr'); if (x.yo) tr.className = 'yo';
+      celda(tr, i + 1); celda(tr, x.nombre + (x.yo ? ' (tú)' : ''));
+      var r = rangoDe(x.puntos); celda(tr, r.icono + ' ' + r.nombre); celda(tr, x.puntos);
+      tb.appendChild(tr);
+    });
+
+    // Rangos
+    var rg = $('rangos'); rg.innerHTML = '';
+    RANGOS.forEach(function (x) {
+      var d = document.createElement('div'); d.className = 'rk-r' + (pts >= x.min ? ' on' : '');
+      var e = document.createElement('div'); e.className = 'e'; e.textContent = x.icono;
+      var b = document.createElement('b'); b.textContent = x.nombre;
+      var s = document.createElement('small'); s.textContent = x.min + '+ puntos';
+      d.appendChild(e); d.appendChild(b); d.appendChild(s); rg.appendChild(d);
+    });
+
+    if ($('nota').textContent.indexOf('⚠️') !== 0) {
+      $('nota').textContent = URL_HOJA_CSV
+        ? 'Clasificación actualizada desde la hoja del programa. Tus puntos se calculan con tu avance en las misiones.'
+        : (USAR_EJEMPLOS ? 'Los participantes marcados como "ejemplo" son datos de muestra. Tus puntos se calculan con tu avance en las misiones.'
+                         : 'Tus puntos se calculan con tu avance en las misiones.');
+    }
+  }
+
+  nombre = leerNombre();
+  $('nombre').value = nombre;
+  $('nombre').addEventListener('input', function () {
+    nombre = this.value; guardarNombre(nombre); render(true);
+  });
+
+  window.addEventListener('storage', function () { nombre = leerNombre() || nombre; render(false); });
+  window.addEventListener('focus', function () { render(false); });
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) render(false); });
+  setInterval(function () { render(false); }, 1500);
+
+  render(true);
+  cargarHoja();
+})();
+</script>
+</body>
+</html>
